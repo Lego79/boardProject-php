@@ -11,7 +11,6 @@ error_reporting(E_ALL);
 ini_set('display_errors', '1');
 
 $boardId = $_GET['board_id'] ?? '';               // 글 식별자
-error_log('boardId: '.$boardId);
 //board 서비스
 $boardRepo     = BoardRepositoryFactory::create();
 $boardservice  = new BoardService($boardRepo);
@@ -52,6 +51,7 @@ $comments = $commentService->getComments($boardId);
       <!-- DB·파일 공통 히든값 -->
       <input type="hidden" name="board_id"     value="<?= $c['board_id'] ?>">
       <input type="hidden" name="member_id" value="<?= $c['member_id'] ?>">
+      <input type="hidden" name="comment_id" value="<?= $c['comment_id'] ?>">
       <button type="submit" name="editComment">수정</button>
       <button type="submit" name="deleteComment">삭제</button>
     </form>
@@ -63,7 +63,7 @@ $comments = $commentService->getComments($boardId);
 
 <form method="post">
   <!-- board_id/파일명을 key 로 사용 -->
-  <input type="hidden" name="board_id" value="<?= htmlspecialchars($key) ?>">
+  <input type="hidden" name="board_id" value="<?= htmlspecialchars($boardId) ?>">
   <textarea name="comment" rows="3" required></textarea>
   <button type="submit" name="writeComment" value="1">댓글 작성</button>
 </form>

@@ -1,16 +1,28 @@
 {
-"comments": [
-    {
-      "id": 1,
-      "member_id": "user456",
-      "board_id": 1,
-      "comment": "좋은 글이네요!"
-    },
-    {
-      "id": 2,
-      "member_id": "user123",
-      "board_id": 1,
-      "comment": "감사합니다."
-    }
-  ]
+    "comments": [
+        {
+            "id": 1,
+            "member_id": "user456",
+            "board_id": 1,
+            "comment": "좋은 글이네요!"
+        },
+        {
+            "id": 2,
+            "member_id": "user123",
+            "board_id": 1,
+            "comment": "감사합니다."
+        },
+        {
+            "id": "68849aa9b44017.58075195",
+            "board_id": "68833bfebd48a1.77181948",
+            "member_id": "mvc",
+            "comment": "asd"
+        },
+        {
+            "id": "68849dbbe50581.21021113",
+            "board_id": "68833bf7138124.85808726",
+            "member_id": "mvc",
+            "comment": "asd"
+        }
+    ]
 }

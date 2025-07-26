@@ -45,7 +45,6 @@ class FileBoardRepository implements BoardRepositoryInterface
             ];
         }
 
-        error_log('FileBoardRepository::getBoards() => '.count($out).' rows');
         return $out;
     }
 

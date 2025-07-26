@@ -36,7 +36,7 @@ class DbCommentRepository implements CommentRepositoryInterface
     }
 
     /* 댓글 수정 */
-    public function updateComment(string $id, string $newText): void
+    public function updateComment(string $commentId, string $memberId, string $newComment, string $boardId): void
     {
         $sql = 'UPDATE comments SET comment = ? WHERE id = ?';
         $stmt = $this->conn->prepare($sql)

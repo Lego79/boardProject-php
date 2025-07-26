@@ -22,8 +22,8 @@ final class CommentService
     {
         if ($_SERVER['REQUEST_METHOD']!=='POST' || !isset($_POST['editComment'])) return;
 
-        if (($_POST['writer'] ?? '') !== ($_SESSION['id'] ?? '')) die('작성자만 수정');
-        $this->repo->updateComment($_POST['id'] ?? '', trim($_POST['comment'] ?? ''));
+        if (($_POST['member_id'] ?? '') !== ($_SESSION['id'] ?? '')) die('작성자만 수정');
+        $this->repo->updateComment($_POST['comment_id'], $_POST['member_id'] ?? '', trim($_POST['comment'] ?? ''), $_POST['board_id']);
         header('Location: '.$_SERVER['REQUEST_URI']); exit;
     }
 

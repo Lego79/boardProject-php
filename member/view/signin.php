@@ -20,7 +20,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'], $_POST['nicknam
         trim($_POST['nickname']),
         $_POST['password']
     );
-    error_log('register result='.($ok ? 'true' : 'false'));
 
 
     if ($ok) {

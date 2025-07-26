@@ -10,7 +10,7 @@ interface CommentRepositoryInterface
     public function getComments(string $articleKey): array;
 
     /** 댓글 수정 (작성자 검증은 Service에서) */
-    public function updateComment(string $id, string $newText): void;
+    public function updateComment(string $commentId, string $memberId, string $newComment, string $boardId): void;
 
     /** 댓글 삭제 (작성자 검증은 Service에서) */
     public function deleteComment(string $id): void;

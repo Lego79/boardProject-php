@@ -9,7 +9,6 @@ class FileMemberRepository implements MemberRepositoryInterface
     public function __construct(private string $memberDir) {}
     public function save(string $id, string $nickname, string $password): void
     {
-        error_log('save() start: id='.$id.', nick='.$nickname);
         $data = JsonHelper::read($this->memberDir, ['members' => []]);
         $before = count($data['members']);
 
@@ -20,7 +19,6 @@ class FileMemberRepository implements MemberRepositoryInterface
         ];
         JsonHelper::write($this->memberDir, $data);
 
-        // error_log('save() done: members '. $before.' -> '.count($data['members']));
     }
 
 
