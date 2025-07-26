@@ -1,0 +1,24 @@
+# ── PHP 민감 정보 (루트에서만) ──
+/config.php
+/db.php
+/setting.json
+
+# ── 텍스트 데이터 (하위 어디서든) ──
+member.txt
+comments.txt
+
+# ── Composer ──
+/vendor/
+/composer.lock
+
+# ── IDE/OS ──
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# ── 백업/로그 ──
+*.log
+*.bak
+*.swp
+*.tmp

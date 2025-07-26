@@ -1,0 +1,29 @@
+{
+    "members": [
+        {
+            "id": "mvc",
+            "password": "mvc",
+            "nickname": "mvc"
+        },
+        {
+            "id": "drag",
+            "password": "drag",
+            "nickname": "drag"
+        },
+        {
+            "id": "asd",
+            "nickname": "asd",
+            "password": "asd"
+        },
+        {
+            "id": "ㅁㄴㅇ",
+            "nickname": "ㅁㄴㅇ",
+            "password": "asd"
+        },
+        {
+            "id": "dd",
+            "nickname": "dd",
+            "password": "dd"
+        }
+    ]
+}

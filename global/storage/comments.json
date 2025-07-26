@@ -1,0 +1,16 @@
+{
+"comments": [
+    {
+      "id": 1,
+      "member_id": "user456",
+      "board_id": 1,
+      "comment": "좋은 글이네요!"
+    },
+    {
+      "id": 2,
+      "member_id": "user123",
+      "board_id": 1,
+      "comment": "감사합니다."
+    }
+  ]
+}
