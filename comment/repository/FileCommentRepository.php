@@ -30,7 +30,7 @@ final class FileCommentRepository implements CommentRepositoryInterface
         foreach ($comments['comments'] as $comment) {
             if ($comment['board_id'] === $boardId) {
                 $out[] = [
-                    'comment_id'        => $comment['id'],
+                    'id'        => $comment['id'],
                     'member_id' => htmlspecialchars($comment['member_id']),
                     'board_id' => htmlspecialchars($comment['board_id']),
                     'comment'   => htmlspecialchars($comment['comment']),
@@ -53,7 +53,7 @@ final class FileCommentRepository implements CommentRepositoryInterface
             error_log('updateComment: commentId='.$commentId.', memberId='.$memberId.', newComment='.$newComment.', boardId='.$boardId);
 
 
-        foreach ($comments['comments'] as $comment) {
+        foreach ($comments['comments'] as &$comment) {
             if((string)($comment['id']?? '') === $commentId &&
                (string)($comment['member_id'] ?? '') === $memberId &&
                (string)($comment['board_id'] ?? '') === $boardId) {
@@ -62,15 +62,32 @@ final class FileCommentRepository implements CommentRepositoryInterface
                 break;
             }
         }
+        error_log('updateComment: updated='.$updated.', commentId='.$commentId.', memberId='.$memberId.', newComment='.$newComment.', boardId='.$boardId);
         unset($comment);
         if($updated) {
             JsonHelper::write($this->commentDir, $comments);
         }
     }
 
-    public function deleteComment(string $id): void
+    public function deleteComment(string $commentId): void
     {
+        $comments = JsonHelper::read($this->commentDir, ['comments'=>[]]);
+        $commentId = (string)$commentId;
+        $updated = false;
+
+        foreach($comments['comments'] as $key => $comment) {
+            if((string)($comment['id'] ?? '') === $commentId) {
+                unset($comments['comments'][$key]);
+                $updated = true;
+                break;
+            }
+        }
+
+        if($updated) {
+            JsonHelper::write($this->commentDir,$comments);
+        }
 
     }
 
 }
+

@@ -31,8 +31,8 @@ final class CommentService
     {
         if ($_SERVER['REQUEST_METHOD']!=='POST' || !isset($_POST['deleteComment'])) return;
 
-        if (($_POST['writer'] ?? '') !== ($_SESSION['id'] ?? '')) die('작성자만 삭제');
-        $this->repo->deleteComment($_POST['id'] ?? '');
+        if (($_POST['member_id'] ?? '') !== ($_SESSION['id'] ?? '')) die('작성자만 삭제');
+        $this->repo->deleteComment($_POST['comment_id'] ?? '');
         header('Location: '.$_SERVER['REQUEST_URI']); exit;
     }
 
