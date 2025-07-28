@@ -4,8 +4,9 @@
 /setting.json
 
 # ── 텍스트 데이터 (하위 어디서든) ──
-member.txt
-comments.txt
+members.json
+boards.json
+comments.json   
 
 # ── Composer ──
 /vendor/
