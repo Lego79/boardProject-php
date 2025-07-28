@@ -7,37 +7,65 @@ final class CommentService
 {
     public function __construct(private CommentRepositoryInterface $repo) {}
 
-    public function createComment(string $boardId): void
+    /** 요청 메서드 분기 및 처리 통합 */
+    public function handlePost(string $boardId): void
     {
-        if ($_SERVER['REQUEST_METHOD']!=='POST' || !isset($_POST['writeComment'])) return;
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            return;
+        }
 
+        if (isset($_POST['writeComment'])) {
+            $this->createComment($boardId);
+        } elseif (isset($_POST['editComment'])) {
+            $this->updateComment();
+        } elseif (isset($_POST['deleteComment'])) {
+            $this->deleteComment();
+        }
+    }
+
+    private function createComment(string $boardId): void
+    {
         $comment = trim($_POST['comment'] ?? '');
         if ($comment === '') return;
 
         $this->repo->createComment($boardId, $_SESSION['id'] ?? '익명', $comment);
-        header('Location: '.$_SERVER['REQUEST_URI']); exit;
+        $this->redirect();
     }
 
-    public function updateComment(): void
+    private function updateComment(): void
     {
-        if ($_SERVER['REQUEST_METHOD']!=='POST' || !isset($_POST['editComment'])) return;
+        if (($_POST['member_id'] ?? '') !== ($_SESSION['id'] ?? '')) {
+            die('작성자만 수정할 수 있습니다.');
+        }
 
-        if (($_POST['member_id'] ?? '') !== ($_SESSION['id'] ?? '')) die('작성자만 수정');
-        $this->repo->updateComment($_POST['comment_id'], $_POST['member_id'] ?? '', trim($_POST['comment'] ?? ''), $_POST['board_id']);
-        header('Location: '.$_SERVER['REQUEST_URI']); exit;
+        $comment = trim($_POST['comment'] ?? '');
+        $this->repo->updateComment(
+            $_POST['comment_id'] ?? '',
+            $_POST['member_id'] ?? '',
+            $comment,
+            $_POST['board_id'] ?? ''
+        );
+        $this->redirect();
     }
 
-    public function deleteComment(): void
+    private function deleteComment(): void
     {
-        if ($_SERVER['REQUEST_METHOD']!=='POST' || !isset($_POST['deleteComment'])) return;
+        if (($_POST['member_id'] ?? '') !== ($_SESSION['id'] ?? '')) {
+            die('작성자만 삭제할 수 있습니다.');
+        }
 
-        if (($_POST['member_id'] ?? '') !== ($_SESSION['id'] ?? '')) die('작성자만 삭제');
         $this->repo->deleteComment($_POST['comment_id'] ?? '');
-        header('Location: '.$_SERVER['REQUEST_URI']); exit;
+        $this->redirect();
     }
 
     public function getComments(string $boardId): array
     {
         return $this->repo->getComments($boardId);
+    }
+
+    private function redirect(): void
+    {
+        header('Location: ' . $_SERVER['REQUEST_URI']);
+        exit;
     }
 }

@@ -51,7 +51,6 @@ $comments = $commentService->getComments($boardId);
       <input type="hidden" name="board_id"     value="<?= $c['board_id'] ?>">
       <input type="hidden" name="member_id"    value="<?= $c['member_id'] ?>">
       <input type="hidden" name="comment_id"   value="<?= $c['id'] ?>">
-      <!-- <input type="hidden" name="old_comment" value="<?= htmlspecialchars($c['comment']) ?>"> -->
       <button type="submit" name="editComment">수정</button>
       <button type="submit" name="deleteComment">삭제</button>
     </form>

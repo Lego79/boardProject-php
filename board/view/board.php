@@ -17,32 +17,20 @@ if (empty($_SESSION['id'])) {
     exit;
 }
 
-/* 서비스 준비 */
-$boardRepop    = BoardRepositoryFactory::create(); // 내부에서 File/DB 선택
-$boardService = new BoardService($boardRepop);
+/* 서비스 준비 및 POST 처리 위임 */
+$boardService = new BoardService(
+    BoardRepositoryFactory::create()
+);
+$boardService->handlePost();  // POST(createBoard, logout) 모두 여기서 처리
 
-/* 글 작성 */
-if (isset($_POST['writePost'])) {
-    $boardService->createBoard();
-    exit;
-}
-
-/* 로그아웃 */
-if (isset($_POST['logout'])) {
-    session_unset();
-    session_destroy();
-    setcookie('remember', '', time() - 3600, '/');
-    header('Location: /boardProject/member/view/login.php');
-    exit;
-}
-
+/* 게시글 조회 */
 $boards = $boardService->getBoards();
 ?>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="utf-8">
-<title>게시판</title>
+    <meta charset="utf-8">
+    <title>게시판</title>
 </head>
 <body>
 
