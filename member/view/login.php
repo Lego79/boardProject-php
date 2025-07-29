@@ -10,33 +10,12 @@ require __DIR__ . '/../../bootstrap.php';
 
 
 
-$repo     = MemberRepositoryFactory::create();
-$service  = new MemberService($repo);
+$memberRepo     = MemberRepositoryFactory::create();
+$memberService  = new MemberService($memberRepo);
 $message  = '';
 
+$memberService->handlePost(); // POST 요청 처리 위임
 
-
-if(isset($_COOKIE['remember'])){
-    $_SESSION['id'] = $_COOKIE['remember'];
-    header('Location: /boardProject/board/view/board.php');
-    setcookie('remember', $_COOKIE['remember'], time()+86400);
-    exit;
-}
-
-if($_SERVER["REQUEST_METHOD"] === "POST") {
-    $ok = $service->login(
-        trim($_POST['id']),
-        $_POST['password']
-    );
-    $_SESSION['id'] = $_POST['id'];
-
-    if ($ok) {
-        header('Location: /boardProject/board/view/board.php');
-        exit;
-    }
-    $message = '아이디 또는 비밀번호를 확인하세요.';
-
-}
 ?>
 
 <html>

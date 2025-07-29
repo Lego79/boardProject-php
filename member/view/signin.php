@@ -13,8 +13,7 @@ $memberRepo     = MemberRepositoryFactory::create();
 $memberService  = new MemberService($memberRepo);
 $message  = '';
 
-$memberService->signIn();
-$memberService->login();
+$memberService->handlePost(); // POST 요청 처리 위임
 
 
 ?>

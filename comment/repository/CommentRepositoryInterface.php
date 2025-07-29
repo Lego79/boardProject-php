@@ -4,10 +4,10 @@ namespace App\Comment\Repository;
 interface CommentRepositoryInterface
 {
     /** 댓글 쓰기 */
-    public function createComment(string $articleKey, string $writer, string $comment): void;
+    public function createComment(string $boardId, string $memberId, string $comment): void;
 
     /** 댓글 목록(최신순) */
-    public function getComments(string $articleKey): array;
+    public function getComments(string $boardId): array;
 
     /** 댓글 수정 (작성자 검증은 Service에서) */
     public function updateComment(string $commentId, string $memberId, string $newComment, string $boardId): void;

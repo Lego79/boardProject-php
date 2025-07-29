@@ -23,10 +23,10 @@ class BoardService
     {
         $title   = trim($_POST['title']   ?? '');
         $content = trim($_POST['content'] ?? '');
-        $author  = $_SESSION['id']         ?? '익명';
+        $memberId  = $_SESSION['id']         ?? '익명';
 
 
-        $this->repo->createBoard($title, $content, $author);
+        $this->repo->createBoard($title, $content, $memberId);
         header('Location: /boardProject/board/view/board.php');
         exit;
     }

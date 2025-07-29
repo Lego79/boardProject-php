@@ -17,13 +17,11 @@ if (empty($_SESSION['id'])) {
     exit;
 }
 
-/* 서비스 준비 및 POST 처리 위임 */
 $boardService = new BoardService(
     BoardRepositoryFactory::create()
 );
-$boardService->handlePost();  // POST(createBoard, logout) 모두 여기서 처리
+$boardService->handlePost();  
 
-/* 게시글 조회 */
 $boards = $boardService->getBoards();
 ?>
 <!DOCTYPE html>

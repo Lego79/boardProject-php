@@ -23,9 +23,7 @@ $commentRepo     = CommentRepositoryFactory::create();
 $commentService  = new CommentService($commentRepo);
 
 /* 작성/수정/삭제 처리 */
-$commentService->createComment($boardId);
-$commentService->updateComment();
-$commentService->deleteComment();
+$commentService->handlePost($boardId);
 
 /* 댓글 목록 */
 $comments = $commentService->getComments($boardId);
