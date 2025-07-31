@@ -12,7 +12,44 @@ if (empty($_SESSION['id'])) {
 }
 $boardService = new BoardService(BoardRepositoryFactory::create());
 $boardService->handlePost();  
-$boards = $boardService->getBoards();
+
+//전체 게시글 수
+$numberOfBoards = $boardService->countBoard();
+
+
+//페이징 관리
+$page       = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$perPage    = 10;
+$pagination = $boardService->pagination($page, $perPage);
+
+// 뷰에 전달
+$totalPages  = $pagination['totalPages'];
+$currentPage = $pagination['currentPage'];
+$boards      = $pagination['boards'];
+
+//페이징 limit 설정
+// 표시할 최대 링크 개수
+$maxLinks = 14;
+
+// 슬라이딩 윈도우 계산
+$half = (int)floor($maxLinks / 2);
+if ($totalPages <= $maxLinks) {
+    $startPage = 1;
+    $endPage   = $totalPages;
+} else {
+    $startPage = $currentPage - $half + 1;
+    $endPage   = $currentPage + $half;
+
+    // 경계 처리
+    if ($startPage < 1) {
+        $startPage = 1;
+        $endPage   = $maxLinks;
+    } elseif ($endPage > $totalPages) {
+        $endPage   = $totalPages;
+        $startPage = $totalPages - $maxLinks + 1;
+    }
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="ko">
@@ -20,6 +57,38 @@ $boards = $boardService->getBoards();
   <meta charset="utf-8">
   <title>게시판</title>
   <link rel="stylesheet" href="/boardProject/public/css/style.css">
+  <style>
+.pagination {
+  width: 100%; /* 필요하면 제한된 폭으로 조정 가능 */
+  margin: 0;
+  padding: 0;
+}
+
+.pagination nav ul {
+  display: flex;
+  gap: 0.5rem; /* 버튼 사이 간격 */
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  justify-content: center; /* 가운데 정렬 핵심 */
+  flex-wrap: wrap; /* 좁은 화면에서 줄바꿈 허용 */
+}
+
+.pagination nav ul li a {
+  display: block;
+  padding: 0.5rem 0.75rem;
+  text-decoration: none;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.pagination nav ul li.active a {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+  </style>
 
 </head>
 <body>
@@ -59,6 +128,28 @@ $boards = $boardService->getBoards();
         <?php endforeach; ?>
       </tbody>
     </table>
+    <div class="pagination">
+      <nav class="pagination">
+        <ul>
+          <!-- 이전 -->
+          <?php if ($currentPage > 1): ?>
+            <li><a href="?page=<?= $currentPage - 1 ?>">« 이전</a></li>
+          <?php endif; ?>
+
+          <!-- 슬라이딩 윈도우 페이지 번호 -->
+          <?php for ($i = $startPage; $i <= $endPage; $i++): ?>
+            <li class="<?= $i === $currentPage ? 'active' : '' ?>">
+              <a href="?page=<?= $i ?>"><?= $i ?></a>
+            </li>
+          <?php endfor; ?>
+
+          <!-- 다음 -->
+          <?php if ($currentPage < $totalPages): ?>
+            <li><a href="?page=<?= $currentPage + 1 ?>">다음 »</a></li>
+          <?php endif; ?>
+        </ul>
+      </nav>
+    </div>
 
     <hr>
 

@@ -1,11 +1,11 @@
 <?php
 namespace App\Board\Service;
 
-use App\Board\Repository\BoardRepositoryInterface;
+use App\Board\Repository\BoardRepository;
 
 class BoardService
 {
-    public function __construct(private BoardRepositoryInterface $repo) {}
+    public function __construct(private BoardRepository $repo) {}
 
 
     public function handlePost(): void
@@ -45,6 +45,12 @@ class BoardService
     {
         return $this->repo->getBoards();
     }
+    public function countBoard(): int 
+    {   
+        error_log('Counting boards', $this->repo->countBoard());
+
+        return $this->repo->countBoard();
+    }
 
  
     public function getBoardById(int|string $boardId): ?array
@@ -57,4 +63,14 @@ class BoardService
     {
         return $this->repo->updateBoard($boardId, $title, $contents);
     }
+
+    
+
+    public function pagination(int $page, int $limit): array
+    {
+        return $this->repo->pagination($page, $limit);
+    }
+
+
+ 
 }

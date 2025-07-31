@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace App\Board\Repository;
 use App\Support\JsonHelper;
 
-class FileBoardRepository implements BoardRepositoryInterface
+class FileBoardRepository
 {
     public function __construct(private string $boardDir) {}
 

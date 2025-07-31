@@ -4,7 +4,7 @@ namespace App\Board\Repository;
 
 class BoardRepositoryFactory
 {
-    public static function create(string $key = ''): BoardRepositoryInterface
+    public static function create(string $key = ''): BoardRepository
      {
 
         return match (STORAGE_TYPE) {          

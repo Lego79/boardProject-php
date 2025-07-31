@@ -8,23 +8,33 @@ body {
   display: flex;
   justify-content: center;
 }
+
 .container {
   width: 100%;
   max-width: 1300px;
   background: #fff;
   padding: 1.5rem;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   border-radius: 8px;
 }
+
 /* — 헤더 — */
 .welcome {
   margin-bottom: 1.5rem;
   font-size: 1.25rem;
   color: #333;
 }
+
 /* — 폼 스타일 — */
-form { margin-top: 1rem; }
-.form-group { margin-bottom: 1rem; margin-right: 1.5rem; }
+form {
+  margin-top: 1rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+  margin-right: 1.5rem;
+}
+
 /* — 테이블 스타일 — */
 table {
   width: 100%;
@@ -32,21 +42,52 @@ table {
   margin-bottom: 1.5rem;
   border-radius: 6px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
-thead { background: #cdd4ddff; color: #fff; }
-th, td { padding: 0.75rem 1rem; text-align: left; font-size: 0.95rem; color: #333; }
-tbody tr { background: #fff; transition: background 0.2s; }
-tbody tr:hover { background: #f0f0f5; }
-a { color: #273c75; text-decoration: none; }
-a:hover { text-decoration: underline; }
-.edit-link { color: #e1b12c; font-weight: 500; }
+
+thead {
+  background: #cdd4ddff;
+  color: #fff;
+}
+
+th,
+td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+tbody tr {
+  background: #fff;
+  transition: background 0.2s;
+}
+
+tbody tr:hover {
+  background: #f0f0f5;
+}
+
+a {
+  color: #273c75;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.edit-link {
+  color: #e1b12c;
+  font-weight: 500;
+}
+
 label {
   display: block;
   margin-bottom: 0.25rem;
   font-size: 0.9rem;
   color: #444;
 }
+
 input[type="text"],
 textarea {
   width: 100%;
@@ -56,11 +97,13 @@ textarea {
   font-size: 0.95rem;
   transition: border-color 0.2s;
 }
+
 input[type="text"]:focus,
 textarea:focus {
   outline: none;
   border-color: #487eb0;
 }
+
 button {
   padding: 0.6rem 1.2rem;
   border: none;
@@ -71,7 +114,11 @@ button {
   cursor: pointer;
   transition: background 0.2s;
 }
-button:hover { background: #40739e; }
+
+button:hover {
+  background: #40739e;
+}
+
 .btn-logout {
   background: transparent;
   color: #e84118;
@@ -80,7 +127,29 @@ button:hover { background: #40739e; }
   padding: 0;
   margin-top: 1rem;
 }
+
 .btn-logout:hover {
   color: #c23616;
   background: none;
+}
+
+.pagination ul {
+  list-style: none;
+  display: flex;
+  gap: 0.5rem;
+  padding: 0;
+}
+
+.pagination li a {
+  display: block;
+  padding: 0.5rem 0.75rem;
+  text-decoration: none;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.pagination li.active a {
+  background-color: #007bff;
+  color: #fff;
+  border-color: #007bff;
 }
