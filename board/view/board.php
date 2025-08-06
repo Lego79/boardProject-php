@@ -13,13 +13,10 @@ if (empty($_SESSION['id'])) {
 $boardService = new BoardService(BoardRepositoryFactory::create());
 $boardService->handlePost();  
 
-//전체 게시글 수
-$numberOfBoards = $boardService->countBoard();
-
 
 //페이징 관리
 $page       = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-$perPage    = 10;
+$perPage    = 14;
 $pagination = $boardService->pagination($page, $perPage);
 
 // 뷰에 전달
@@ -27,28 +24,20 @@ $totalPages  = $pagination['totalPages'];
 $currentPage = $pagination['currentPage'];
 $boards      = $pagination['boards'];
 
-//페이징 limit 설정
-// 표시할 최대 링크 개수
-$maxLinks = 10;
+//페이지 번호 개수 10
+$windowSize = 10;
+$halfWindow = floor($windowSize / 2);
 
-// 슬라이딩 윈도우 계산
-$half = (int)floor($maxLinks / 2);
-if ($totalPages <= $maxLinks) {
-    $startPage = 1;
-    $endPage   = $totalPages;
-} else {
-    $startPage = $currentPage - $half + 1;
-    $endPage   = $currentPage + $half;
+$startPage = max(1, $currentPage - $halfWindow);
+$endPage = min($totalPages, $startPage + $windowSize - 1);
 
-    // 경계 처리
-    if ($startPage < 1) {
-        $startPage = 1;
-        $endPage   = $maxLinks;
-    } elseif ($endPage > $totalPages) {
-        $endPage   = $totalPages;
-        $startPage = $totalPages - $maxLinks + 1;
-    }
-}
+//navigation 로직
+// 반복문으로 돌림
+// 시작페이지가 1보다 작으면 1~10
+// forloop로 돌려서 from startpage to endpage
+//ul로 감싸고, li는 반복문으로 돌려서 페이지를 렌더링 한다
+
+
 
 ?>
 <!DOCTYPE html>
@@ -99,18 +88,42 @@ if ($totalPages <= $maxLinks) {
         <?php endforeach; ?>
       </tbody>
     </table>
-    <div class="pagination">
-      <nav class="pagination">
-        <ul>
-          <?php for ($i = $startPage; $i <= $endPage; $i++): ?>
-            <li class="<?= $i === $currentPage ? 'active' : '' ?>">
-              <a href="?page=<?= $i ?>"><?= $i ?></a>
-            </li>
-          <?php endfor; ?>
-        </ul>
-      </nav>
-    </div>
+    <nav class="pagination">
+      <ul>
+        <?php for($i = $startPage; $i <= $endPage; $i++): ?>
+          <li class="<?= $i === $currentPage ? 'active' : '' ?>">
+            <a 
+              href="?page=<?= $i ?>"
+              aria-current="<?= $i === $currentPage ? 'page' : '' ?>">
+              <?= $i ?>
+            </a>  
+          </li>
+        <?php endfor; ?>  
+      </ul>
+    </nav>
+    <nav class="pagination">
+    <nav class="pagination">
+      <ul>        
+        <li>
 
+        </li>
+      </ul>
+    </nav>
+    </nav>
+    <nav class="pagination">
+      <ul>
+        <?php for ($i = $startPage; $i <= $endPage; $i++): ?>
+          <li class="<?= $i === $currentPage ? 'active' : '' ?>">
+            <a
+              href="?page=<?= $i ?>"
+              aria-current="<?= $i === $currentPage ? 'page' : '' ?>"
+            >
+              <?= $i ?>
+            </a>
+          </li>
+        <?php endfor; ?>
+      </ul>
+    </nav>
     <hr>
 
     <h2>글 작성</h2>

@@ -38,7 +38,6 @@ class DbBoardRepository implements BoardRepository
         return $out;
     }
 
-
     public function getBoardById(int|string $key): ?array
     {
         $stmt = $this->conn->prepare(
@@ -73,13 +72,31 @@ class DbBoardRepository implements BoardRepository
 
     public function pagination(int $page, int $perPage): array
     {
+        //1. 프로그래밍 언어 읽는법 + 의미 이해
+        //2. 시작과 끝 부분 체크
+        //3. 최소한 체크할 부분 - 출력 값 db 값 비교
+
+
+        // 과제
+        //1. 정렬 기능
+        //2. 작성일자, 오름차순은 선택 가능하게, default 내림차순
+
+        //기록
+        //1. 일일 단위로, 취업, 개발 각각 몇시간
+    
         //전체 글 수 카운트 하기
         $totalCount = $this->countBoard();
+        // $this - 현재 객채의 주소값
+
         //전체 페이지 수 계산 - ceil은 소수점 올림, 페이지 수 정수화
         $totalPages = (int) ceil($totalCount / $perPage);
+        
         //현재 페이지 번호 조정
         // 1 <= $page <= $totalPages
         $page = max(1, min($page, $totalPages));
+        //대입 연산자는 오른쪽부터
+        // 가장 작은 괄호부터
+        
         // 조회 시작 위치 계산
         $offset = ($page -1) * $perPage;
 
@@ -102,8 +119,11 @@ class DbBoardRepository implements BoardRepository
 
         // prepare(): SQL 문을 DB에 미리 컴파일 요청
 
+        //offset 개념에 익숙해 져야함, 0번에서부터 1칸뒤, index - 배열, 배열도 offset 개념이 있음
+        // LIMIT 10 OFFSET 20
 
-       // 실패시 익셉션 던지고 종료하기
+
+        // 실패시 익셉션 던지고 종료하기
         if (!$stmt->execute()) {
             // 실패 시 예외 던지고 종료
             $err = $stmt->error;
@@ -137,9 +157,6 @@ class DbBoardRepository implements BoardRepository
 
 
     }
-
-
-
 
     public function countBoard(): int
     {
