@@ -70,93 +70,96 @@ class DbBoardRepository implements BoardRepository
         return $stmt->execute();
     }
 
-    public function pagination(int $page, int $perPage): array
+    public function pagination(int $page, int $perPage, string $order): array
     {
-        //1. 프로그래밍 언어 읽는법 + 의미 이해
-        //2. 시작과 끝 부분 체크
-        //3. 최소한 체크할 부분 - 출력 값 db 값 비교
-
-
-        // 과제
-        //1. 정렬 기능
-        //2. 작성일자, 오름차순은 선택 가능하게, default 내림차순
-
-        //기록
-        //1. 일일 단위로, 취업, 개발 각각 몇시간
-    
-        //전체 글 수 카운트 하기
+        // 현재 클래스의 countBoard 메서드를 사용하여 전체 게시글 수를 가져옵니다.
         $totalCount = $this->countBoard();
-        // $this - 현재 객채의 주소값
 
-        //전체 페이지 수 계산 - ceil은 소수점 올림, 페이지 수 정수화
+        // totalCount/ perPage로 전체 페이지 수를 계산합니다.
+        // ceil을 사용하여 올림 처리합니다. 1.0 2.0인 값을 int로 형변환을 합니다
         $totalPages = (int) ceil($totalCount / $perPage);
-        
-        //현재 페이지 번호 조정
-        // 1 <= $page <= $totalPages
-        $page = max(1, min($page, $totalPages));
-        //대입 연산자는 오른쪽부터
-        // 가장 작은 괄호부터
-        
-        // 조회 시작 위치 계산
-        $offset = ($page -1) * $perPage;
 
-        //쿼리문
+        // 전체 페이지가 1보다 작으면 1을 반환합니다
+        // 반환한 totalPages의 값과 $page의 값을 비교하여 현재 페이지를 반환합니다
+        // 페이지 번호가 1보다 작거나 전체 페이지 수보다 크면 1로 설정합니다.
+        $page = max(1, min($page, max(1, $totalPages))); // 게시글 0건일 때 보호
+
+        // 페이지 번호에 따라 오프셋을 계산합니다.
+        // 페이지 번호가 1이면 오프셋은 0, 페이지 번호가 2이면 오프셋은 perPage의 값이 됩니다.
+        // 페이지 번호가 3이면 오프셋은 perPage * 2의 값이 됩니다.
+        // 오프셋은 현재 페이지 번호에서 1을 빼고 perPage를 곱합니다.
+        // 예를 들어, 페이지 번호가 2이고 perPage가 14이면
+        // 오프셋은 (2 - 1) * 14 = 14
+        // 예를 들어, 페이지 번호가 3이고 perPage가 14이면
+        // 오프셋은 (3 - 1) * 14 = 28
+        $offset = ($page - 1) * $perPage;
+
+        //$order의 값이 'asc' 이냐? 맞느면 asc를 반환하고 아니면 desc를 반환 합니다
+        $order = strtoupper($order) === 'ASC' ? 'ASC' : 'DESC';
+
+        // 쿼리의 id desc, asc 있던 부분을 $order로 변경하여, 입력된 변수 값으로 처리합니다
         $sql = <<<SQL
-            SELECT id as board_id,
-                   member_id,
-                   title,
-                   contents
+            SELECT id as board_id, member_id, title, contents
             FROM board
-            ORDER BY id DESC
+            ORDER BY id {$order}
             LIMIT ? OFFSET ?
         SQL;
 
-        $stmt = $this -> conn -> prepare($sql)
-            ?: throw new RuntimeException($this -> conn -> error);
+        // 쿼리 실행을 위해 prepare합니다.
+        $stmt = $this->conn->prepare($sql) ?: throw new RuntimeException($this->conn->error);
+        // 쿼리의 LIMIT와 OFFSET에 사용할 파라미터를 바인딩합니다.
+        $stmt->bind_param('ii', $perPage, $offset);
 
-        //바인드 파람 사용시 - 변수 타입 정의 ii -> int int
-        $stmt -> bind_param('ii', $perPage, $offset);
-
-        // prepare(): SQL 문을 DB에 미리 컴파일 요청
-
-        //offset 개념에 익숙해 져야함, 0번에서부터 1칸뒤, index - 배열, 배열도 offset 개념이 있음
-        // LIMIT 10 OFFSET 20
-
-
-        // 실패시 익셉션 던지고 종료하기
+        // 쿼리를 실행합니다.
         if (!$stmt->execute()) {
-            // 실패 시 예외 던지고 종료
             $err = $stmt->error;
             $stmt->close();
             throw new RuntimeException($err);
         }
-
+        // 쿼리 결과를 가져옵니다.
         $result = $stmt->get_result();
-        $rows = $result -> fetch_all(MYSQLI_ASSOC);
+        //
+        $rows   = $result->fetch_all(MYSQLI_ASSOC);
         $stmt->close();
+        
+        //boards를 담을 배열을 생성
+        $boards = [];
 
-        $startNo = $offset + 1;
-        $boards  = array_map(function(array $row) use (&$startNo) {
-            return [
-                'no'        => $startNo++,
+        //$rows = 게시글 offset, limit에 해당하는 게시글을 담고 있습니다.
+        //as $rows as $idx => $row의 의미는 
+        // $rows 배열의 각 요소를 순회하면서 인덱스와 값을 가져오는 것입니다.
+        // $idx는 현재 요소의 인덱스(0부터 시작)이고,
+        // $row는 현재 요소의 값입니다.
+        // 이 반복문을 통해 각 게시글의 정보를 boards 배열에 추가합니다.
+        foreach ($rows as $idx => $row) {
+            $boards[] = [
+                // 이렇게 했을 때 asc를 하든지, desc를 하든지 번혹 1번부터 매겨지게 됩니다.
+                'no'        => $idx + 1,
                 'board_id'  => (string)$row['board_id'],
-                'title'     => htmlspecialchars($row['title'],     ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'),
-                'member_id' => htmlspecialchars($row['member_id'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'),
-                'contents'  => $row['contents'],  // 후처리 필요 시 여기에 추가
+                'title'     => htmlspecialchars(
+                                $row['title'],
+                                ENT_QUOTES | ENT_SUBSTITUTE,
+                                'UTF-8'
+                            ),
+                'member_id' => htmlspecialchars(
+                                $row['member_id'],
+                                ENT_QUOTES | ENT_SUBSTITUTE,
+                                'UTF-8'
+                            ),
+                'contents'  => $row['contents'],
             ];
-        }, $rows);
+        }
 
-        $pagedBoards = [
+        return [
             'totalCount'  => $totalCount,
             'totalPages'  => $totalPages,
             'currentPage' => $page,
             'boards'      => $boards,
+            // (필요시 'order'도 함께 반환)
         ];
-
-        return $pagedBoards;
-
-
     }
+
+
 
     public function countBoard(): int
     {
@@ -171,6 +174,38 @@ class DbBoardRepository implements BoardRepository
         error_log('Counting boards: ' . $count);
 
         return $count;
+    }
+
+    public function orderByDesc(): array
+    {
+        $sql = 'SELECT id, member_id, title FROM board ORDER BY id DESC';
+        $res = $this->conn->query($sql) ?: throw new RuntimeException($this->conn->error);
+
+        $out = [];
+        while ($row = $res->fetch_assoc()) {
+            $out[] = [
+                'board_id' => (string)$row['id'],
+                'title'    => htmlspecialchars($row['title'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'),
+                'member_id' => htmlspecialchars($row['member_id'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'),
+            ];
+        }
+        return $out;
+    }
+
+    public function orderByAsc(): array
+    {
+        $sql = 'SELECT id, member_id, title FROM board ORDER BY id ASC';
+        $res = $this->conn->query($sql) ?: throw new RuntimeException($this->conn->error);
+
+        $out = [];
+        while ($row = $res->fetch_assoc()) {
+            $out[] = [
+                'board_id' => (string)$row['id'],
+                'title'    => htmlspecialchars($row['title'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'),
+                'member_id' => htmlspecialchars($row['member_id'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'),
+            ];
+        }
+        return $out;
     }
 
 

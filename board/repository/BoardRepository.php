@@ -7,7 +7,9 @@ interface BoardRepository
     public function getBoards(): array;
     public function getBoardById(int|string $boardId): ?array;
     public function updateBoard(int|string $boardId, string $title, string $content): bool; 
-    public function pagination(int $page, int $limit): array;
+    public function pagination(int $page, int $limit, string $order): array;
     public function countBoard(): int ;
+    public function orderByDesc(): array;
+    public function orderByAsc(): array;
 
 }

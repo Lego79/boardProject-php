@@ -3,42 +3,47 @@ declare(strict_types=1);
 session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
+
 require dirname(__DIR__, 2) . '/bootstrap.php';
+
 use App\Board\Repository\BoardRepositoryFactory;
 use App\Board\Service\BoardService;
+
 if (empty($_SESSION['id'])) {
     header('Location: /boardProject/member/view/login.php');
     exit;
 }
+
 $boardService = new BoardService(BoardRepositoryFactory::create());
-$boardService->handlePost();  
+$boardService->handlePost();
+
+// ✅ 정렬 먼저 해석
+//ORDER의 값은 기본값이 DESC이다,
+//order의 값이 'asc' 이냐? 맞느면 asc를 반환하고 아니면 desc를 반환 해라
+// ✅ 정렬 포함해서 호출
+
+// 페이징 관리
+$page    = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$perPage = 14;
+
+$order = strtoupper($_GET['order'] ?? 'DESC') === 'ASC' ? 'ASC' : 'DESC';
+$pagination = $boardService->pagination($page, $perPage, $order);
 
 
-//페이징 관리
-$page       = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-$perPage    = 14;
-$pagination = $boardService->pagination($page, $perPage);
 
-// 뷰에 전달
+
+
+
+// 뷰로 전달
 $totalPages  = $pagination['totalPages'];
 $currentPage = $pagination['currentPage'];
 $boards      = $pagination['boards'];
 
-//페이지 번호 개수 10
+// 페이지 번호 슬라이딩 윈도우
 $windowSize = 10;
-$halfWindow = floor($windowSize / 2);
-
-$startPage = max(1, $currentPage - $halfWindow);
-$endPage = min($totalPages, $startPage + $windowSize - 1);
-
-//navigation 로직
-// 반복문으로 돌림
-// 시작페이지가 1보다 작으면 1~10
-// forloop로 돌려서 from startpage to endpage
-//ul로 감싸고, li는 반복문으로 돌려서 페이지를 렌더링 한다
-
-
-
+$halfWindow = (int)floor($windowSize / 2);
+$startPage  = max(1, $currentPage - $halfWindow);
+$endPage    = min($totalPages, $startPage + $windowSize - 1);
 ?>
 <!DOCTYPE html>
 <html lang="ko">
@@ -46,10 +51,6 @@ $endPage = min($totalPages, $startPage + $windowSize - 1);
   <meta charset="utf-8">
   <title>게시판</title>
   <link rel="stylesheet" href="/boardProject/public/css/style.css">
-  <style>
-
-  </style>
-
 </head>
 <body>
   <div class="container">
@@ -88,34 +89,14 @@ $endPage = min($totalPages, $startPage + $windowSize - 1);
         <?php endforeach; ?>
       </tbody>
     </table>
-    <nav class="pagination">
-      <ul>
-        <?php for($i = $startPage; $i <= $endPage; $i++): ?>
-          <li class="<?= $i === $currentPage ? 'active' : '' ?>">
-            <a 
-              href="?page=<?= $i ?>"
-              aria-current="<?= $i === $currentPage ? 'page' : '' ?>">
-              <?= $i ?>
-            </a>  
-          </li>
-        <?php endfor; ?>  
-      </ul>
-    </nav>
-    <nav class="pagination">
-    <nav class="pagination">
-      <ul>        
-        <li>
 
-        </li>
-      </ul>
-    </nav>
-    </nav>
+    <!-- 페이지네이션: order 유지 -->
     <nav class="pagination">
       <ul>
         <?php for ($i = $startPage; $i <= $endPage; $i++): ?>
           <li class="<?= $i === $currentPage ? 'active' : '' ?>">
             <a
-              href="?page=<?= $i ?>"
+              href="?page=<?= $i ?>&order=<?= urlencode($order) ?>"
               aria-current="<?= $i === $currentPage ? 'page' : '' ?>"
             >
               <?= $i ?>
@@ -124,6 +105,14 @@ $endPage = min($totalPages, $startPage + $windowSize - 1);
         <?php endfor; ?>
       </ul>
     </nav>
+
+    <!-- 정렬 버튼 -->
+    <form method="get" class="sort-form" style="margin:1em 0;">
+      <input type="hidden" name="page" value="<?= (int)$currentPage ?>">
+      <button type="submit" name="order" value="ASC">오래된 순</button>
+      <button type="submit" name="order" value="DESC">최신 순</button>
+    </form>
+
     <hr>
 
     <h2>글 작성</h2>
