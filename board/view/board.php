@@ -17,22 +17,32 @@ if (empty($_SESSION['id'])) {
 $boardService = new BoardService(BoardRepositoryFactory::create());
 $boardService->handlePost();
 
-// ✅ 정렬 먼저 해석
 //ORDER의 값은 기본값이 DESC이다,
 //order의 값이 'asc' 이냐? 맞느면 asc를 반환하고 아니면 desc를 반환 해라
-// ✅ 정렬 포함해서 호출
 
 // 페이징 관리
 $page    = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $perPage = 14;
-
 $order = strtoupper($_GET['order'] ?? 'DESC') === 'ASC' ? 'ASC' : 'DESC';
-$pagination = $boardService->pagination($page, $perPage, $order);
+$keyword    = trim($_GET['keyword'] ?? '');      
+$target     = $_GET['target'] ?? 'title';      
+
+// 게시글 목록을 가져옵니다.
+$pagination = $boardService->pagination(
+    $page,
+    $perPage,
+    $order,
+    $menuId = null,
+    $keyword,
+    $target
+);
 
 
-
-
-
+$baseQuery = [
+    'order'  => $order,
+    'target' => $target,
+    'keyword' => $keyword,
+];
 
 // 뷰로 전달
 $totalPages  = $pagination['totalPages'];
@@ -44,6 +54,11 @@ $windowSize = 10;
 $halfWindow = (int)floor($windowSize / 2);
 $startPage  = max(1, $currentPage - $halfWindow);
 $endPage    = min($totalPages, $startPage + $windowSize - 1);
+
+//필터용 메뉴 가져오기
+$menus = $boardService->getMenuFilters();  
+
+
 ?>
 <!DOCTYPE html>
 <html lang="ko">
@@ -54,6 +69,12 @@ $endPage    = min($totalPages, $startPage + $windowSize - 1);
 </head>
 <body>
   <div class="container">
+    <nav class="top-nav" style="margin-bottom:1rem;">
+      <a href="/boardProject/board/view/board.php"
+        style="font-weight:bold; text-decoration:none;">
+        📋 전체 글
+      </a>
+    </nav>
     <div class="welcome">
       <?= htmlspecialchars($_SESSION['id'], ENT_QUOTES) ?>님, 환영합니다!
     </div>
@@ -90,21 +111,43 @@ $endPage    = min($totalPages, $startPage + $windowSize - 1);
       </tbody>
     </table>
 
-    <!-- 페이지네이션: order 유지 -->
+    <?php if ($totalPages > 1): ?>     <!-- 페이지가 2개 이상일 때만 표시 -->
     <nav class="pagination">
       <ul>
         <?php for ($i = $startPage; $i <= $endPage; $i++): ?>
+          <?php
+            $baseQuery['page'] = $i;             // 이전 답변의 $baseQuery 재사용
+            $url = '?' . http_build_query($baseQuery);
+          ?>
           <li class="<?= $i === $currentPage ? 'active' : '' ?>">
-            <a
-              href="?page=<?= $i ?>&order=<?= urlencode($order) ?>"
-              aria-current="<?= $i === $currentPage ? 'page' : '' ?>"
-            >
+            <a href="<?= $url ?>" aria-current="<?= $i === $currentPage ? 'page' : '' ?>">
               <?= $i ?>
             </a>
           </li>
         <?php endfor; ?>
       </ul>
     </nav>
+    <?php endif; ?>
+
+
+    <!-- 메뉴 + 검색 -->
+    <form method="get" class="filter-form" style="display:flex; gap:6px; margin:1em 0;">
+
+      <select name="target">
+        <option value="title"   <?= ($_GET['target']??'')==='title'   ?'selected':''?>>제목+내용</option>
+        <option value="member"  <?= ($_GET['target']??'')==='member'  ?'selected':''?>>작성자</option>
+        <option value="comment" <?= ($_GET['target']??'')==='comment' ?'selected':''?>>댓글</option>
+      </select>
+
+      <input type="text" name="keyword" value="<?= htmlspecialchars($_GET['q'] ?? '') ?>"
+            placeholder="검색어 입력" style="flex:1">
+      <button type="submit">검색</button>
+
+      <!-- 정렬·페이지 파라미터 유지 -->
+      <input type="hidden" name="page"  value="<?= $currentPage ?>">
+      <input type="hidden" name="order" value="<?= $order ?>">
+    </form>
+
 
     <!-- 정렬 버튼 -->
     <form method="get" class="sort-form" style="margin:1em 0;">

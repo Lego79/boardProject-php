@@ -63,8 +63,19 @@ class BoardService
         return $this->repo->updateBoard($boardId, $title, $contents);
     }
 
-    public function pagination(int $page, int $limit, string $order): array
+    public function pagination(
+        int     $page,
+        int     $perPage,
+        string  $order,
+        ?int    $menuId  = null,
+        string  $keyword = '',
+        string  $target  = 'title',
+    ): array {
+        return $this->repo->pagination($page, $perPage, $order, $menuId, $keyword, $target);
+    }
+
+    public function getMenuFilters(): array
     {
-        return $this->repo->pagination($page, $limit, $order);
+        return $this->repo->getMenuFilters();
     }
 }
