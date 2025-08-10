@@ -94,14 +94,14 @@ $menus = $boardService->getMenuFilters();
           <tr>
             <td><?= $b['no'] ?></td>
             <td>
-              <a href="/boardProject/board/articles/article.php?board_id=<?= urlencode($b['board_id']) ?>">
+              <a href="/boardProject/board/articles/article.php?board_id=<?= urlencode((string)$b['board_id']) ?>">
                 <?= htmlspecialchars($b['title'], ENT_QUOTES) ?>
               </a>
             </td>
             <td><?= htmlspecialchars($b['member_id'], ENT_QUOTES) ?></td>
             <td>
               <?php if ($editable): ?>
-                <a class="edit-link" href="/boardProject/board/view/boardEdit.php?board_id=<?= urlencode($b['board_id']) ?>">
+                <a class="edit-link" href="/boardProject/board/view/boardEdit.php?board_id=<?= urlencode((string)$b['board_id']) ?>">
                   수정
                 </a>
               <?php endif; ?>
@@ -139,8 +139,8 @@ $menus = $boardService->getMenuFilters();
         <option value="comment" <?= ($_GET['target']??'')==='comment' ?'selected':''?>>댓글</option>
       </select>
 
-      <input type="text" name="keyword" value="<?= htmlspecialchars($_GET['q'] ?? '') ?>"
-            placeholder="검색어 입력" style="flex:1">
+    <input type="text" name="keyword" value="<?= htmlspecialchars($_GET['q'] ?? '') ?>">
+
       <button type="submit">검색</button>
 
       <!-- 정렬·페이지 파라미터 유지 -->
@@ -152,9 +152,12 @@ $menus = $boardService->getMenuFilters();
     <!-- 정렬 버튼 -->
     <form method="get" class="sort-form" style="margin:1em 0;">
       <input type="hidden" name="page" value="<?= (int)$currentPage ?>">
+      <input type="hidden" name="target" value="<?= htmlspecialchars($target, ENT_QUOTES) ?>">
+      <input type="hidden" name="keyword" value="<?= htmlspecialchars($keyword, ENT_QUOTES) ?>">
       <button type="submit" name="order" value="ASC">오래된 순</button>
       <button type="submit" name="order" value="DESC">최신 순</button>
     </form>
+
 
     <hr>
 

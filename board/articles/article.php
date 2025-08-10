@@ -10,7 +10,21 @@ use App\Comment\Service\CommentService;
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
 
-$boardId = $_GET['board_id'] ?? '';
+$boardIdRaw = $_GET['board_id'] ?? null;
+
+if ($boardIdRaw === null || !ctype_digit((string)$boardIdRaw)) {
+    http_response_code(400);
+    echo '잘못된 요청입니다.(board_id)';
+    exit;
+}
+
+$boardId = (int)$boardIdRaw;
+if ($boardId <= 0) {
+    http_response_code(400);
+    echo '잘못된 게시글 번호입니다.';
+    exit;
+}
+
 
 /* ─── 게시글 서비스 ─── */
 $boardRepo     = BoardRepositoryFactory::create();
@@ -72,6 +86,14 @@ $comments = $commentService->getComments($boardId);
       </div>
     </article>
 
+    <form method="post" action="">
+      <input type="hidden" name="board_id" value="<?= (int)$boardId ?>">
+      <button type="submit" name="toggleLike" class="btn">
+        <?= $boardservice->isLikedByUser((int)$boardId) ? '💔 취소' : '👍 좋아요' ?>
+        (<?= $boardservice->getLikeCount((int)$boardId) ?>)
+      </button>
+    </form>
+
     <hr class="divider">
 
     <!-- 댓글 영역 -->
@@ -109,6 +131,9 @@ $comments = $commentService->getComments($boardId);
       <?php else: ?>
         <p class="muted">등록된 댓글이 없습니다.</p>
       <?php endif; ?>
+
+
+
 
       <hr class="divider">
 
