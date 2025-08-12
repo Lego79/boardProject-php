@@ -31,6 +31,9 @@ $boardRepo     = BoardRepositoryFactory::create();
 $boardservice  = new BoardService($boardRepo);
 $board         = $boardservice->getBoardById($boardId);
 
+//좋아요
+$boardservice ->handlePost($boardId);
+
 /* 게시글이 없으면 404 처리 */
 if (!$board) {
     http_response_code(404);

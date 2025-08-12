@@ -110,7 +110,7 @@ class BoardService
         }
 
         // 현재 페이지로 돌아가기
-        header('Location: /boardProject/board/view/boardDetail.php?board_id=' . $boardId);
+        header('Location: /boardProject/board/articles/article.php?board_id=' . $boardId);
         exit;
     }
 
